@@ -276,6 +276,46 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const workflowSection = document.querySelector(".workflow-section");
+    const routeSegments = workflowSection?.querySelectorAll(".workflow-route-segment");
+    if (!workflowSection || !routeSegments?.length) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    const updateRoute = () => {
+      frame = 0;
+      if (reducedMotion.matches) {
+        routeSegments.forEach((segment) => { segment.style.strokeDashoffset = "0"; });
+        return;
+      }
+
+      const bounds = workflowSection.getBoundingClientRect();
+      const travel = window.innerHeight + bounds.height;
+      const progress = Math.max(0, Math.min(1, (window.innerHeight - bounds.top) / travel));
+      const segmentProgress = progress * routeSegments.length;
+      routeSegments.forEach((segment, index) => {
+        segment.style.strokeDashoffset = String(1 - Math.max(0, Math.min(1, segmentProgress - index)));
+      });
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateRoute);
+    };
+
+    routeSegments.forEach((segment) => { segment.style.strokeDasharray = "1"; });
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    reducedMotion.addEventListener?.("change", scheduleUpdate);
+    updateRoute();
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      reducedMotion.removeEventListener?.("change", scheduleUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -571,11 +611,11 @@ function App() {
           <div className="workflow-journey-shell">
             <svg className="workflow-route" viewBox="0 0 1000 320" preserveAspectRatio="none" aria-hidden="true">
               <path className="workflow-route-base" d="M155 56 C270 27 385 27 500 56 S730 85 845 56 C910 95 910 214 845 264 C730 293 615 293 500 264 S270 235 155 264" />
-              <path className="workflow-route-segment" data-reveal style={{ "--reveal-delay": "0ms" }} d="M155 56 C270 27 385 27 500 56" pathLength="1" />
-              <path className="workflow-route-segment" data-reveal style={{ "--reveal-delay": "100ms" }} d="M500 56 C615 85 730 85 845 56" pathLength="1" />
-              <path className="workflow-route-segment" data-reveal style={{ "--reveal-delay": "200ms" }} d="M845 56 C910 95 910 214 845 264" pathLength="1" />
-              <path className="workflow-route-segment" data-reveal style={{ "--reveal-delay": "300ms" }} d="M845 264 C730 293 615 293 500 264" pathLength="1" />
-              <path className="workflow-route-segment" data-reveal style={{ "--reveal-delay": "400ms" }} d="M500 264 C385 235 270 235 155 264" pathLength="1" />
+              <path className="workflow-route-segment" d="M155 56 C270 27 385 27 500 56" pathLength="1" />
+              <path className="workflow-route-segment" d="M500 56 C615 85 730 85 845 56" pathLength="1" />
+              <path className="workflow-route-segment" d="M845 56 C910 95 910 214 845 264" pathLength="1" />
+              <path className="workflow-route-segment" d="M845 264 C730 293 615 293 500 264" pathLength="1" />
+              <path className="workflow-route-segment" d="M500 264 C385 235 270 235 155 264" pathLength="1" />
             </svg>
 
             <ol className="workflow-journey" aria-label="Six stages from idea to finished digital product">
