@@ -205,8 +205,6 @@ function ProjectCard({ project }) {
   return (
     <article
       className={`project-showcase project-showcase-${Number(project.number)}`}
-      data-reveal
-      style={{ "--reveal-delay": `${Number(project.number) * 100}ms` }}
     >
       <a
         className="project-visual-link"
@@ -252,6 +250,40 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const links = Array.from(document.querySelectorAll(".desktop-nav a"));
+    const sections = links
+      .map((link) => ({ link, section: document.getElementById(link.getAttribute("href")?.slice(1)) }))
+      .filter(({ section }) => section);
+    if (!sections.length) return undefined;
+
+    let frame = 0;
+    const updateCurrentLink = () => {
+      frame = 0;
+      const marker = window.innerHeight * 0.42;
+      const current = sections
+        .filter(({ section }) => section.getBoundingClientRect().top <= marker)
+        .sort((first, second) => first.section.getBoundingClientRect().top - second.section.getBoundingClientRect().top)
+        .at(-1) ?? sections[0];
+      sections.forEach(({ link, section }) => {
+        if (section === current.section) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateCurrentLink);
+    };
+
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    updateCurrentLink();
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
     const revealItems = document.querySelectorAll("[data-reveal]");
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -277,9 +309,60 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const showcases = document.querySelectorAll(".project-showcase");
+    if (!showcases.length) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    const updateShowcases = () => {
+      frame = 0;
+      const viewportHeight = window.innerHeight;
+      const start = viewportHeight * 0.82;
+      const end = viewportHeight * 0.43;
+
+      showcases.forEach((showcase, index) => {
+        if (reducedMotion.matches) {
+          showcase.style.setProperty("--project-scroll-progress", "1");
+          const staticOffset = window.innerWidth > 700 ? (index % 2 === 0 ? -18 : 18) : 0;
+          showcase.style.setProperty("--project-scroll-x", `${staticOffset}px`);
+          showcase.setAttribute("data-scroll-ready", "true");
+          return;
+        }
+
+        const { top } = showcase.getBoundingClientRect();
+        const progress = Math.max(0, Math.min(1, (start - top) / (start - end)));
+        const direction = index % 2 === 0 ? -1 : 1;
+        const desktopOffset = window.innerWidth > 700 ? direction * 18 : 0;
+        const enterOffset = direction * 72;
+        const x = desktopOffset + enterOffset * (1 - progress);
+
+        showcase.style.setProperty("--project-scroll-progress", progress.toFixed(4));
+        showcase.style.setProperty("--project-scroll-x", `${x.toFixed(2)}px`);
+        showcase.setAttribute("data-scroll-ready", "true");
+      });
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateShowcases);
+    };
+
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    reducedMotion.addEventListener?.("change", scheduleUpdate);
+    updateShowcases();
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      reducedMotion.removeEventListener?.("change", scheduleUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
     const workflowSection = document.querySelector(".workflow-section");
     const routeSegments = workflowSection?.querySelectorAll(".workflow-route-segment");
-    if (!workflowSection || !routeSegments?.length) return undefined;
+    const workflowStages = workflowSection?.querySelectorAll(".workflow-stage");
+    if (!workflowSection || !routeSegments?.length || !workflowStages?.length) return undefined;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
@@ -287,6 +370,7 @@ function App() {
       frame = 0;
       if (reducedMotion.matches) {
         routeSegments.forEach((segment) => { segment.style.strokeDashoffset = "0"; });
+        workflowStages.forEach((stage) => stage.removeAttribute("data-scroll-active"));
         return;
       }
 
@@ -296,6 +380,14 @@ function App() {
       const segmentProgress = progress * routeSegments.length;
       routeSegments.forEach((segment, index) => {
         segment.style.strokeDashoffset = String(1 - Math.max(0, Math.min(1, segmentProgress - index)));
+      });
+      const stageProgress = progress * workflowStages.length;
+      workflowStages.forEach((stage, index) => {
+        if (stageProgress >= index + 1) {
+          stage.setAttribute("data-scroll-active", "true");
+        } else {
+          stage.removeAttribute("data-scroll-active");
+        }
       });
     };
     const scheduleUpdate = () => {
@@ -405,14 +497,14 @@ function App() {
             </div>
 
             <h1>
-              Building digital experiences that{" "}
-              <span>stand out.</span>
+              <span className="hero-heading-first">Building Digital Experiences</span>
+              <br className="hero-heading-break" />
+              <span className="hero-heading-second">That Stand Out.</span>
             </h1>
 
             <p className="hero-intro">
-              I&apos;m {contactDetails.name}, a {contactDetails.title} interested in web
-              development, digital marketing, and creative content. I build digital experiences, edit videos, create visual
-              content, and continuously improve my skills through practical projects.
+              I&apos;m {contactDetails.name}, a {contactDetails.title}. I build responsive websites,
+              create visual content, edit videos, and support digital marketing through practical projects.
             </p>
 
             <div className="hero-actions">
@@ -500,14 +592,11 @@ function App() {
 
             <div className="about-lower">
               <p>
-                I&apos;m {contactDetails.name} — a {contactDetails.title} drawn to the
-                intersection of technology, visuals, and ideas. I enjoy making things for the web, shaping content, and
-                figuring out how digital experiences can work better for people.
+                I&apos;m {contactDetails.name}, a {contactDetails.title}. I build responsive websites and create work
+                across video, graphic design, e-commerce, and digital marketing.
               </p>
               <p>
-                My approach is hands-on: learn by making, pay attention to the details, and keep
-                improving with every project. From a website to a social creative, I like turning a
-                rough idea into something clear and considered.
+                I learn by making practical projects, refining each idea into a clear, useful digital experience.
               </p>
             </div>
 
@@ -553,8 +642,7 @@ function App() {
           <div className="services-heading" data-reveal>
             <SectionHeading eyebrow="Ways I can help" title={<>Good ideas deserve<br />good execution.</>} />
             <p>
-              Thoughtful support from first idea to finished creative. Every project is different,
-              so the details are shaped together.
+              Thoughtful support from first idea to finished creative, shaped around each project.
             </p>
           </div>
 

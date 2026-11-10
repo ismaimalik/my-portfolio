@@ -24,8 +24,7 @@ export const projects = [
   {
     name: "AllyMart",
     category: "E-commerce / Online Marketplace",
-    description:
-      "An e-commerce marketplace focused on product discovery, online shopping, and product presentation.",
+    description: "An e-commerce marketplace for product discovery and online shopping.",
     url: "https://allymart.pk/",
     number: "01",
     kind: "marketplace",
@@ -35,8 +34,7 @@ export const projects = [
   {
     name: "UltraSolix",
     category: "Web / Digital Project",
-    description:
-      "A digital commerce platform bringing together product and promotion workflows, payment journeys, and connected integrations.",
+    description: "A digital commerce platform for product, promotion, and payment workflows.",
     url: "https://ultrasolix.com/",
     number: "02",
     kind: "platform",
@@ -48,22 +46,22 @@ export const projects = [
 export const skills = [
   {
     name: "Web Development",
-    description: "Building useful, responsive experiences for the web.",
+    description: "Responsive websites and useful web experiences.",
     icon: "code",
   },
   {
     name: "Meta Ads",
-    description: "Supporting campaign setup and digital ad workflows.",
+    description: "Campaign setup and digital ad workflows.",
     icon: "megaphone",
   },
   {
     name: "Video Editing",
-    description: "Shaping clips into clear, engaging visual stories.",
+    description: "Editing clips into clear visual stories.",
     icon: "video",
   },
   {
     name: "Graphic Design",
-    description: "Creating visual assets for digital communication.",
+    description: "Visual assets for digital communication.",
     icon: "pen",
   },
   {
@@ -73,17 +71,17 @@ export const skills = [
   },
   {
     name: "E-commerce Management",
-    description: "Supporting product presentation and store content.",
+    description: "Product presentation and online store content.",
     icon: "store",
   },
   {
     name: "Canva",
-    description: "Designing practical visual content with Canva.",
+    description: "Creating visual content with Canva.",
     icon: "layout",
   },
   {
     name: "AI Tools",
-    description: "Exploring AI tools to support creative workflows.",
+    description: "AI tools for creative workflows.",
     icon: "sparkles",
   },
 ];
@@ -91,22 +89,22 @@ export const skills = [
 export const services = [
   {
     name: "Website Development",
-    description: "Responsive websites and digital experiences shaped around your goals.",
+    description: "Responsive websites shaped around your goals.",
     icon: "code",
   },
   {
     name: "Video Editing",
-    description: "Thoughtful edits for short-form and everyday digital content.",
+    description: "Short-form and everyday digital content edits.",
     icon: "video",
   },
   {
     name: "Meta Ads Support",
-    description: "Practical help preparing and managing Meta advertising workflows.",
+    description: "Support for Meta ad setup and management.",
     icon: "megaphone",
   },
   {
     name: "Social Media Creatives",
-    description: "Consistent visual assets that help your content feel considered.",
+    description: "Consistent visual assets for social content.",
     icon: "image",
   },
 ];

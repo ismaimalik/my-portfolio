@@ -11,7 +11,7 @@ This portfolio is a polished, dark-themed personal website for Ismail Malik, a W
 - Tailwind CSS for layout utilities, spacing, and responsive design
 - Lucide React for interface icons
 - Plain CSS for the premium visual design, responsive layouts, hover treatments, and reduced-motion-aware transitions
-- Native `IntersectionObserver` for lightweight scroll reveals; no additional animation dependency was added
+- Native `IntersectionObserver` for lightweight entrance reveals and `requestAnimationFrame` with passive scroll listeners for reversible scroll-progress animations; no additional animation dependency was added
 
 ## 3. Folder structure and important files
 
@@ -44,8 +44,8 @@ Notable files:
 
 ## 4. Website sections and functionality
 
-1. Navigation bar with logo, menu links, CTA button, and responsive mobile menu.
-2. Hero section with the headline “Building Digital Experiences That Stand Out.”
+1. Floating glass navigation bar with the original wordmark, section links, a Let's Talk CTA, active-section underline, and responsive mobile menu.
+2. Full-width centered hero section with a balanced two-line headline: Building Digital Experiences / That Stand Out. The headline can wrap naturally on narrow screens.
 3. About section describing creative thinking and practical learning.
 4. Featured Projects section for AllyMart and UltraSolix.
 5. Skills section with icon cards.
@@ -72,16 +72,17 @@ Notable files:
 
 ## 6. Features and interactive elements implemented
 
-- Smooth-scrolling anchor navigation
-- Mobile menu open/close with toggle and Escape key support, animated dark glass panel, rounded layered navigation cards, and touch feedback
-- Animated navigation underlines, gradient CTA buttons, and moving arrows
-- Alternating, full-width project showcases with separate large preview frames, project copy, and animated outbound links
+- Smooth-scrolling anchor navigation with an active-section state exposed through `aria-current="location"`
+- Sticky, slightly floating dark-glass navigation with a violet-tinted border, backdrop blur, animated hover/focus/current underlines, and a compact Let's Talk CTA
+- Mobile menu open/close with toggle and Escape-key support, animated glass panel, rounded navigation cards, touch feedback, internal scrolling within the viewport height, and close-on-link selection
+- Alternating project showcases with separate large preview frames, project copy, outbound links, and scroll-progress entrance animations. AllyMart moves in from the left first; UltraSolix follows from the right. Both reverse smoothly on upward scrolling.
+- Desktop project showcases settle at subtle opposite horizontal offsets; on mobile they stack in the existing preview/content order without horizontal overflow.
 - Showcase hover lift, violet-blue border glow, and browser-mockup zoom
 - Desktop hover lift, depth, soft shadow, and violet-blue accent glow for skill cards and service rows, plus a gentle forward movement for their section headings
 - Touch-specific press feedback for navigation, skills, and service items without applying desktop hover movement to touch devices
-- Reimagined “From idea to done” as a six-stage creative journey: Discover, Plan, Design, Build, Launch, and Improve. A custom CSS 3D-inspired idea prism anchors the composition; distinct stage symbols sit along an SVG path that draws in as its segments enter the viewport.
-- The workflow keeps a desktop zig-zag path and becomes a vertical numbered journey on mobile. Stages reveal progressively, respond to desktop hover, and respect reduced-motion settings.
-- IntersectionObserver scroll reveals trigger once as content enters the viewport, then remain visible on upward scrolling to avoid flicker
+- Reimagined “From idea to done” as a six-stage creative journey: Discover, Plan, Design, Build, Launch, and Improve. A custom CSS 3D-inspired idea prism anchors the composition; the existing SVG route draws in proportion to scroll progress through the section.
+- The workflow keeps a desktop zig-zag path and becomes a vertical numbered journey on mobile. On mobile, each stage's icon and accents illuminate in order according to that same scroll progress and deactivate in reverse when scrolling upward.
+- Other marked content uses native `IntersectionObserver` reveals. Project showcases use reversible scroll-position progress instead of the one-time reveal observer.
 - Reduced-motion bypass that makes reveal content visible immediately and disables animation
 - External project links with `rel="noopener noreferrer"`
 - Contact form on the left with native validation and a prefilled `mailto:` fallback addressed to Ismail's supplied email; it explicitly explains that the visitor's email app opens and the website does not send the message
@@ -89,13 +90,15 @@ Notable files:
 - Integrated right-side profile card with the original portrait, the requested intro line, and clickable email, phone, WhatsApp, LinkedIn, Instagram, and Facebook rows.
 - GitHub is excluded from contact and footer displays since a profile URL was not provided.
 - Reduced-motion support using `@media (prefers-reduced-motion: reduce)`
+- In reduced-motion mode, the workflow route is shown statically, project showcases remain visible without entrance movement, and navbar transitions are disabled.
 - Skip link for keyboard users
 - Accessible buttons, labels, and semantic page sections
 
 ## 7. Responsive design, SEO, and performance improvements
 
-- Responsive layouts for mobile, tablet, and desktop screens; project showcases stack on phones and retain alternating placement on larger screens. The narrow-screen hero typography and art are constrained to prevent horizontal overflow on 320px-wide screens.
+- Responsive layouts for mobile, tablet, and desktop screens; project showcases stack on phones and retain alternating preview/content orientation on larger screens. The narrow-screen hero typography and art are constrained to prevent horizontal overflow on 320px-wide screens.
 - Mobile navigation is constrained to the available viewport height and scrolls internally when needed to avoid small-screen overflow.
+- The sticky navbar keeps its floating glass treatment at all sizes, with the desktop link row replaced by a touch-friendly menu on mobile.
 - Desktop-only 3D hover transforms use CSS and are gated by fine-pointer/hover media queries; touch devices get restrained active feedback. Reduced-motion preferences disable the added transitions and transforms.
 - Clean typography, muted gray text, violet/blue accents, and dark background palette
 - Abstract visual element in the hero and the supplied, locally bundled portrait in Contact.
@@ -103,7 +106,7 @@ Notable files:
 - SEO title, author, description, and Open Graph metadata identify Ismail Malik as a Web Developer & Digital Creative.
 - CSS illustrative browser mockups in place of fabricated project screenshots.
 - Portrait is bundled locally; no third-party image host is needed. Its original PNG is retained at full quality.
-- No animation framework was added; scroll reveals use the native IntersectionObserver API.
+- No animation framework was added; content reveals use native `IntersectionObserver`, while the workflow and featured-project animations map scroll position with passive scroll listeners and `requestAnimationFrame`.
 - The 1.81 MB portrait is lazy-loaded; an approved compressed WebP derivative could reduce transfer size later if preserving the original asset separately.
 
 ## 8. Dependencies installed and their purpose
@@ -150,14 +153,15 @@ The provided WhatsApp number is linked using the international-format destinatio
 - Confirmed the open mobile menu stays within a 320px viewport, has rounded navigation cards, and toggles closed after choosing a link.
 - Hover-tested skill cards, the skills and services headings, and service rows on desktop; each receives the intended restrained 3D lift. Checked reduced-motion mode disables these transforms.
 - Checked the six-stage workflow arrangement and document overflow at 320, 390, 768, 1024, and 1440px.
-- Verified the workflow's staggered stage and SVG-path reveals, restrained desktop hover treatment, vertical mobile layout, and reduced-motion behavior.
+- Verified the workflow's scroll-progress SVG route, progressive mobile stage illumination, restrained desktop hover treatment, vertical mobile layout, and reduced-motion behavior.
 - Confirmed both featured project links have the correct destination, open in a new tab, and set `rel="noopener noreferrer"`.
 - Hovered a project card and verified its lift, border tint, and preview zoom are applied.
 - Emulated reduced-motion and confirmed transitions collapse to near-zero duration.
 - Confirmed the contact portrait loads from the app bundle at 1122 × 1402 pixels.
 - Confirmed contact email, phone, WhatsApp, LinkedIn, Instagram, and Facebook links render with their supplied destinations, and no GitHub link or dummy contact placeholder is shown.
 - Confirmed the empty contact form fails native validity checks. Its valid-submit handler constructs a prefilled `mailto:` draft addressed to the supplied email and presents an explicit no-delivery notice; no false success state is used.
-- Confirmed project, contact, and other marked content reveals when it first enters the viewport and remains visible when scrolling back up.
+- Confirmed ordinary marked content reveals once when it enters the viewport. Featured project showcases instead follow each card's scroll position, enter in sequence from opposite sides, and reverse on upward scrolling.
+- Latest production verification after the hero, workflow, project animation, and navigation refinements: `npm run build` completed successfully. Visual checks for the latest navbar and scroll-driven project changes remain to be repeated in a browser preview.
 - Verified the Vite dev server responds with HTTP 200 at `http://127.0.0.1:5173/`.
 
 ### Errors fixed during implementation
